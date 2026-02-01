@@ -8,6 +8,7 @@ const Self = @This();
 allocator: std.mem.Allocator,
 width: i32,
 height: i32,
+music: raylib.Music,
 
 pub fn init(allocator: std.mem.Allocator) !Self {
     const w = 800;
@@ -16,15 +17,25 @@ pub fn init(allocator: std.mem.Allocator) !Self {
     raylib.initWindow(w, h, "Zig Visualizer - Split Files");
     raylib.setTargetFPS(60);
 
+    raylib.initAudioDevice();
+
+    const music = try raylib.loadMusicStream("song.mp3");
+
+    raylib.playMusicStream(music);
+
     return Self{
         .allocator = allocator,
         .width = w,
         .height = h,
+        .music = music,
     };
 }
 
 pub fn deinit(self: *Self) void {
-    _ = self;
+    raylib.unloadMusicStream(self.music);
+
+    // 2. Turn off the driver
+    raylib.closeAudioDevice();
     raylib.closeWindow();
 }
 
@@ -34,7 +45,7 @@ pub fn shouldClose(self: *Self) bool {
 }
 
 pub fn update(self: *Self) void {
-    _ = self;
+    raylib.updateMusicStream(self.music);
 }
 
 pub fn draw(self: *Self) void {
